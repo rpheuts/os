@@ -60,14 +60,14 @@ curl http://multiprecision.org/mpc/download/${MPC}.tar.gz -o ${MPC}.tar.gz
 curl http://ftp.gnu.org/pub/gnu/libiconv/${LIBICONV}.tar.gz -o ${LIBICONV}.tar.gz
 
 tar -xjf ${GCC}.tar.gz
-tar -xzf ${GMP}.tar.gz
+tar -xzf ${GMP}.tar.bz2
 tar -xjf ${MPFR}.tar.gz
 tar -xjf ${MPC}.tar.gz
 tar -xjf ${LIBICONV}.tar.gz
 
 mv ${GMP} ${GCC}/gmp
 mv ${MPFR} ${GCC}/mpfr
-mv ${MPC} ${GCC}gcc/
+mv ${MPC} ${GCC}/mpc
 mv ${LIBICONV} ${GCC}/libiconv
 
 mkdir build-gcc
