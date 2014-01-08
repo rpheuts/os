@@ -14,4 +14,5 @@ fdisk -yia dos ${DEVNAME}
 fdisk -yu -f ../src/stage0/stage0.bin ${DEVNAME}
 
 # Copy stage1
-dd if=../src/stage1/stage1.bin of=${DEVNAME} seek=1 bs=512 conv=notrunc
+dd if=../src/stage1/entry.bin of=${DEVNAME} seek=1 bs=512 conv=notrunc
+dd if=../src/stage1/main.bin of=${DEVNAME} seek=2 bs=512 conv=notrunc

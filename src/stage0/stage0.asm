@@ -6,7 +6,7 @@
 TOTALSECTORCOUNT		dw 0x02
 KERNEL32SECTORCOUNT		dw 0x02
 
-LOADMESSAGE			db 'Loading Stage 2...', 0
+LOADMESSAGE			db 'Loading Stage 2...                      ', 0
 PASSMESSAGE			db 'Pass', 0
 FAILMESSAGE			db 'Fail', 0
 
