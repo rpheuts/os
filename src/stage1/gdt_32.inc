@@ -4,28 +4,34 @@
 ;*********************************
 ;* Global Descriptor Table (GDT) *
 ;*********************************
-NULL_DESC:
-    dd 0            ; null descriptor
-    dd 0
+GDTR:
+        dw        GDTEND - GDT - 1                ; size of GDT
+        dd        (GDT - $$ + 0x10000)        ; 32-bit base address
 
-CODE_DESC:
-    dw 0xFFFF       ; limit low
-    dw 0            ; base low
-    db 0            ; base middle
-    db 10011010b    ; access
-    db 11001111b    ; granularity
-    db 0            ; base high
+GDT:
+        NULLDESCRIPTOR:
+                dw        0x0000
+                dw        0x0000
+                db        0x00  
+                db        0x00  
+                db        0x00
+                db        0x00
 
-DATA_DESC:
-    dw 0xFFFF       ; data descriptor
-    dw 0            ; limit low
-    db 0            ; base low
-    db 10010010b    ; access
-    db 11001111b    ; granularity
-    db 0            ; base high
+        CODESEGMENTDESCRIPTOR:
+                dw        0xffff        ; segment size(15:00)
+                dw        0x0000        ; base address(15:00)
+                db        0x00        ; base address(23:16)
+                db        0x9a        ; P=1, DPL=0, S=1, Type=0x0a(Execute/Read)
+                db        0xcf        ; G=1, D/B=1, L=0, AVL=0, segment size(19:16)
+                db        0x00        ; base address(31:24)
 
-gdtr:
-    Limit dw gdtr - NULL_DESC - 1 ; length of GDT
-    Base dd NULL_DESC   ; base of GDT
-
+        DATASEGMENTDESCRIPTOR:
+                dw        0xffff        ; segment size(15:00)
+                dw        0x0000        ; base address(15:00)
+                db        0x00        ; base address(23:16)
+                db        0x92        ; P=1, DPL=0, S=1, Type=0x02(Read/Write)
+                db        0xcf        ; G=1, D/B=1, L=0, AVL=0, segment size(19:16)
+                db        0x00        ; base address(31:24)
+GDTEND:
+	
 %endif ;__GDT_INC_INCLUDED__

@@ -5,12 +5,12 @@ global _start
 _start:
 	jmp Continue		; jump to Continue label. 
 
+%include "gdt_32.inc"
+
 LOADMESSAGE			db 'Stage 2 initializing...                 ', 0
 A20MESSAGE			db 'Enabling A20 Gate...                    ', 0
 PMMESSAGE			db 'Switching to Protected mode...          ', 0
 FAILMESSAGE			db 'Error', 0
-
-%include "gdt_32.inc"
 
 Continue:
 	mov ax, 0x1000
@@ -36,17 +36,12 @@ Continue:
 	cli                     ; clear interrupts
 	
 	call OpenA20Gate
-	call CheckA20Gate
-	cmp ax, 1
-	jne ErrorMessage
 	
 	mov si, PMMESSAGE
 	call DisplayMessage
 	
-	lgdt [gdtr]             ; load GDT from GDTR (see gdt_32.inc)
-	call EnablePMode       	; jumps to ProtectedMode
+	jmp EnablePMode
 	
-	jmp $					; Just in case it fails
 		
 ;;;;;;;;;;;;;;;;;;;;;;
 ; FUNCTIONS
@@ -72,81 +67,45 @@ ErrorMessage:
 	jmp $
 
 OpenA20Gate:
-	in al, 0x93				; switch A20 gate via fast A20 port 92
-	
-	or al, 2				; set A20 Gate bit 1
-	and al, ~1				; clear INIT_NOW bit
-	out 0x92, al
-	
-	ret
+	mov ax, 0x2401
+    int 0x15
 
-CheckA20Gate:
-    pushf
-    push ds
-    push es
-    push di
-    push si
- 
-    cli
- 
-    xor ax, ax 				; ax = 0
-    mov es, ax
- 
-    not ax 					; ax = 0xFFFF
-    mov ds, ax
- 
-    mov di, 0x0500
-    mov si, 0x0510
- 
-    mov al, byte [es:di]
-    push ax
- 
-    mov al, byte [ds:si]
-    push ax
- 
-    mov byte [es:di], 0x00
-    mov byte [ds:si], 0xFF
- 
-    cmp byte [es:di], 0xFF
- 
-    pop ax
-    mov byte [ds:si], al
- 
-    pop ax
-    mov byte [es:di], al
- 
-    mov ax, 0
-    je CheckA20GateDone
- 
-    mov ax, 1
- 
-CheckA20GateDone:
-    pop si
-    pop di
-    pop es
-    pop ds
-    popf
- 
-    ret
+    jc A20GATEERROR
+    jmp A20GATESUCCESS
+
+A20GATEERROR:
+    in al, 0x92
+
+    or al, 0x02
+    and al, 0xFE
+
+    out 0x92, al
+
+A20GATESUCCESS:	
+	ret
     
 EnablePMode:
-    mov eax, cr0
-    or eax, 1
-    mov cr0, eax
-    
-    mov        ax, 0x20                                                                ; set DS, ES, FS, GS to 0x10(Data Segment Descriptor)
-    mov        ds, ax
+	cli
+	lgdt [GDTR]             ; load GDT from GDTR (see gdt_32.inc)
+    mov eax, 0x4000003B                        ; PG=0, CD=1, NW=0, AM=0, WP=0, NE=1, ET=1, TS=1, EM=0, MP=1, PE=1
+	mov cr0, eax
+
+    jmp        dword 0x08:(ProtectedMode - $$ + 0x10000)
+
+[BITS 32]    
+ProtectedMode:
+    mov ax, 0x10                                                                ; set DS to 0x10 (Data Segment Descriptor)
+    mov ds, ax
+	mov ss, ax                                                                        ; set stack register(SS, ESP, EBP)
+    mov esp, 0xfffe
+    mov ebp, 0xfffe
+	
+	mov	ax, 0x08
 	mov es, ax
     mov fs, ax
     mov gs, ax
-
-    mov        ss, ax                                                                        ; set stack register(SS, ESP, EBP)
-    mov        esp, 0xfffe
-    mov        ebp, 0xfffe
-
-    jmp $
+    
+    hlt
 	
 	
 times 512 - ($ - $$) db 0x00			; fill address 0 to 512 with 0
-
-Next:

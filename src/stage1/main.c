@@ -1,6 +1,19 @@
 #include <stddef.h>
 #include <stdint.h>
 
+void terminal_initialize();
+void terminal_writestring();
+
+void kernel_main()
+{
+	terminal_initialize();
+	/* Since there is no support for newlines in terminal_putchar yet, \n will
+     produce some VGA specific character instead. This is normal. */
+	terminal_writestring("Hello, kernel World!\n");
+    
+    while (1);
+}
+
 /* Hardware text mode color constants. */
 enum vga_color
 {
@@ -95,12 +108,4 @@ void terminal_writestring(const char* data)
 	size_t datalen = strlen(data);
 	for ( size_t i = 0; i < datalen; i++ )
 		terminal_putchar(data[i]);
-}
- 
-void kernel_main()
-{
-	terminal_initialize();
-	/* Since there is no support for newlines in terminal_putchar yet, \n will
-	   produce some VGA specific character instead. This is normal. */
-	terminal_writestring("Hello, kernel World!\n");
 }
