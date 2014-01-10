@@ -39,6 +39,9 @@ Continue:
 	
 	mov si, PMMESSAGE
 	call DisplayMessage
+
+	mov ax, 0x03
+	int 10h
 	
 	jmp EnablePMode
 	
@@ -105,7 +108,7 @@ ProtectedMode:
     mov fs, ax
     mov gs, ax
     
-    hlt
+    jmp dword 0x08:0x10200
 	
 	
 times 512 - ($ - $$) db 0x00			; fill address 0 to 512 with 0
