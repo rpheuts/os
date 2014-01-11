@@ -7,6 +7,9 @@ DEVNAME="disk.img"
 # Create image
 dd if=/dev/zero bs=1024 count=${NUMSECTORS} > ${DEVNAME}
 
+# Provision with exFat
+fdisk -yia dos ${DEVNAME}
+
 # Copy stage0 bootloader
 fdisk -yu -f ../src/stage0/stage0.bin ${DEVNAME}
 
