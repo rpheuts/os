@@ -8,7 +8,7 @@ toolchain
 
 The script in 'local' will compile and configure a cross-compiler (GCC) on an OSX machine (and probably on a Linux machine too).
 
-In the 'vagrant' you'll find an 'environment-in-a-box' using Vagrant and Chef. Just run 'vagrant up' and it should build a custom VM for you that contains the required assembler and crosscompilers (32 & 64-bit) plus a mapped directory into the VM with the sources. You should be able to build the sources from within the VM (vagrant ssh) and then run it on the host machine with QEMU. 
+In the 'vagrant' dir you'll find an 'environment-in-a-box' using Vagrant and Chef. Just run 'vagrant up' and it should build a custom VM for you that contains the required assembler and crosscompilers (32 & 64-bit) plus a mapped directory into the VM with the sources. You should be able to build the sources from within the VM (vagrant ssh) and then run it on the host machine with QEMU. 
 
 qemu
 ----
