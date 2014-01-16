@@ -52,7 +52,7 @@ Continue:
 	
 		
 ;;;;;;;;;;;;;;;;;;;;;;
-; FUNCTIONS
+; 16-bit Functions
 ;;;;;;;;;;;;;;;;;;;;;;
 
 DisplayMessage:
@@ -91,6 +91,10 @@ A20GATEERROR:
 
 A20GATESUCCESS:	
 	ret
+
+;;;;;;;;;;;;;;;;;;;;;;
+; Protected Mode
+;;;;;;;;;;;;;;;;;;;;;;
     
 [BITS 32]    
 ProtectedMode:
@@ -104,7 +108,24 @@ ProtectedMode:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    
-    jmp dword 0x08:0x10200	
-	
-times 512 - ($ - $$) db 0x00			; fill address 0 to 512 with 0
+
+    ; Prepare for switch to 64-bit
+    mov eax, cr4
+    or eax, 0x20                	; set PAE bit of CR4 to 1
+    mov cr4, eax
+
+    mov eax, 0x100000        		; set the value of CR3 register to the base address of PML4 table
+    mov cr3, eax
+                
+    mov ecx, 0xc0000080        		; read MSR register
+    rdmsr                                
+
+    or eax, 0x0100                	; write MSR register
+    wrmsr
+
+    mov eax, cr0
+    or eax, 0xe0000000
+    xor eax, 0x60000000
+    mov cr0, eax
+
+    jmp 0x08:0x200000
