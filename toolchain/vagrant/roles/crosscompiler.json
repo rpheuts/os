@@ -12,7 +12,8 @@
 	
 	"run_list": [
 		"recipe[apt]",
-		"recipe[gcc]"
+		"recipe[crosscompiler::gcc32]"
+		"recipe[crosscompiler::gcc64]"
 	],
 	
 	"env_run_lists": {
