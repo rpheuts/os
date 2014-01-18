@@ -16,6 +16,8 @@ bash "binutils" do
   code <<-EOH
     export PATH="#{node['cc64']['prefix']}/bin:$PATH"
 
+    rm -rf binutils
+
     mkdir binutils
     pushd binutils
     curl http://ftp.gnu.org/gnu/binutils/#{node['cc64']['binutils']}.tar.gz -o #{node['cc64']['binutils']}.tar.gz
@@ -41,6 +43,8 @@ bash "get_sources" do
    cwd "/tmp/"
    code <<-EOH
     export PATH="#{node['cc64']['prefix']}/bin:$PATH"
+
+    rm -rf gcc
 
     mkdir gcc
     pushd gcc
