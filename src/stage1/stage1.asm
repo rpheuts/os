@@ -96,6 +96,10 @@ A20GATESUCCESS:
 ; Protected Mode
 ;;;;;;;;;;;;;;;;;;;;;;
     
+%define PAGE_PRESENT    (1 << 0)
+%define PAGE_WRITE      (1 << 1)
+%define FREE_SPACE 0x9000
+
 [BITS 32]    
 ProtectedMode:
     mov ax, 0x10			; set DS to 0x10 (Data Segment Descriptor)
@@ -109,14 +113,54 @@ ProtectedMode:
     mov fs, ax
     mov gs, ax
 
+    mov edi, FREE_SPACE
+
+    ; Build the Page Map Level 4.
+    ; es:di points to the Page Map Level 4 table.
+    lea eax, [es:di + 0x1000]         ; Put the address of the Page Directory Pointer Table in to EAX.
+    or eax, PAGE_PRESENT | PAGE_WRITE ; Or EAX with the flags - present flag, writable flag.
+    mov [es:di], eax                  ; Store the value of EAX as the first PML4E.
+ 
+ 
+    ; Build the Page Directory Pointer Table.
+    lea eax, [es:di + 0x2000]         ; Put the address of the Page Directory in to EAX.
+    or eax, PAGE_PRESENT | PAGE_WRITE ; Or EAX with the flags - present flag, writable flag.
+    mov [es:di + 0x1000], eax         ; Store the value of EAX as the first PDPTE.
+ 
+ 
+    ; Build the Page Directory.
+    lea eax, [es:di + 0x3000]         ; Put the address of the Page Table in to EAX.
+    or eax, PAGE_PRESENT | PAGE_WRITE ; Or EAX with the flags - present flag, writeable flag.
+    mov [es:di + 0x2000], eax         ; Store to value of EAX as the first PDE.
+ 
+ 
+    push di                           ; Save DI for the time being.
+    lea di, [di + 0x3000]             ; Point DI to the page table.
+    mov eax, PAGE_PRESENT | PAGE_WRITE    ; Move the flags into EAX - and point it to 0x0000.
+
+    ; Build the Page Table.
+.LoopPageTable:
+    mov [es:di], eax
+    add eax, 0x1000
+    add di, 8
+    cmp eax, 0x200000                 ; If we did all 2MiB, end.
+    jb .LoopPageTable 
+
+    pop di                            ; Restore DI.
+
+    ; Disable IRQs
+    mov al, 0xFF                      ; Out 0xFF to 0xA1 and 0x21 to disable all IRQs.
+    out 0xA1, al
+    out 0x21, al
+
     ; Prepare for switch to 64-bit
     mov eax, cr4
     or eax, 0x20                	; set PAE bit of CR4 to 1
     mov cr4, eax
 
-    mov eax, 0x100000        		; set the value of CR3 register to the base address of PML4 table
-    mov cr3, eax
-                
+    mov edx, edi                      ; Point CR3 at the PML4.
+    mov cr3, edx   
+ 
     mov ecx, 0xc0000080        		; read MSR register
     rdmsr                                
 
@@ -127,5 +171,24 @@ ProtectedMode:
     or eax, 0xe0000000
     xor eax, 0x60000000
     mov cr0, eax
+    
+    jmp 0x18:(x8664Mode - $$ + 0x10000)
 
-    jmp 0x08:0x200000
+;;;;;;;;;;;;;;;;;;;;;;
+; x86_64 Mode
+;;;;;;;;;;;;;;;;;;;;;;
+
+[BITS 64]
+
+x8664Mode:
+    mov        ax, 0x20
+    mov        ds, ax
+    mov        es, ax
+    mov        fs, ax
+    mov        gs, ax
+
+    mov        ss, ax
+    mov        rsp, 0x6ffff8
+    mov        rbp, 0x6ffff8
+  
+    jmp $
