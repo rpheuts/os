@@ -189,8 +189,8 @@ x8664Mode:
     mov gs, ax
 
     mov ss, ax
-    mov rsp, 0x6ffff8
-    mov rbp, 0x6ffff8
+    mov rsp, 0xffff8
+    mov rbp, 0xffff8
    
     mov	rax, 0x10400
     jmp rax

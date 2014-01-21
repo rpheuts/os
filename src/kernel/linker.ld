@@ -2,7 +2,7 @@
 OUTPUT_FORMAT("elf64-x86-64", "elf64-x86-64",
               "elf64-x86-64")
 OUTPUT_ARCH(i386:x86-64)
-ENTRY(_start)
+ENTRY(start)
 SEARCH_DIR("/usr/cross/x86_64-pc-linux/lib64"); SEARCH_DIR("/usr/cross/x86_64-pc-linux/lib");
 SECTIONS
 {

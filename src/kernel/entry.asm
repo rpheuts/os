@@ -4,7 +4,8 @@
 SECTION .text
 
 extern main
-global _start
+global start
 
-_start:
+start:
+	call main
 	jmp $
