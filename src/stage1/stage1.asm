@@ -171,8 +171,9 @@ ProtectedMode:
     or eax, 0xe0000000
     xor eax, 0x60000000
     mov cr0, eax
-    
+   
     jmp 0x18:(x8664Mode - $$ + 0x10000)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ; x86_64 Mode
@@ -181,14 +182,15 @@ ProtectedMode:
 [BITS 64]
 
 x8664Mode:
-    mov        ax, 0x20
-    mov        ds, ax
-    mov        es, ax
-    mov        fs, ax
-    mov        gs, ax
+    mov ax, 0x20
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
 
-    mov        ss, ax
-    mov        rsp, 0x6ffff8
-    mov        rbp, 0x6ffff8
-  
-    jmp $
+    mov ss, ax
+    mov rsp, 0x6ffff8
+    mov rbp, 0x6ffff8
+   
+    mov	rax, 0x10400
+    jmp rax
