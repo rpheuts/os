@@ -1,0 +1,5 @@
+#!/bin/bash
+cd ../kernel
+mount -o loop ../kernel.img /mnt/floppy
+cp kernel.bin /mnt/floppy
+umount /mnt/floppy

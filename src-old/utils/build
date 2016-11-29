@@ -1,0 +1,20 @@
+#!/bin/bash
+cd ../kernel
+nasm -f aout -o start.o start.asm
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o main.o main.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o screen.o screen.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o gdt.o gdt.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o idt.o idt.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o isrs.o isrs.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o timer.o timer.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o kb.o kb.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o mem.o mem.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o sshell.o sshell.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o kernlib.o kernlib.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o ide.o ../drivers/ide.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o floppy.o ../drivers/floppy.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o cmos.o ../drivers/cmos.c
+gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include -I../drivers -I../include -c -o fat32.o ../drivers/fat32.c
+
+ld -T link.ld -o kernel.bin start.o main.o screen.o irq.o gdt.o idt.o isrs.o mem.o timer.o kb.o sshell.o kernlib.o ide.o floppy.o cmos.o fat32.o
+
