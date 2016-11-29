@@ -6,12 +6,11 @@ void terminal_writestring();
 
 void main()
 {
-	while (1);
 	terminal_initialize();
+	while (1);
 	/* Since there is no support for newlines in terminal_putchar yet, \n will
      produce some VGA specific character instead. This is normal. */
 	terminal_writestring("Hello, kernel World!\n");
-    
 }
 
 /* Hardware text mode color constants. */
